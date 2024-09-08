@@ -4,6 +4,7 @@ const handleGetAllUser = async () => {
     try {
         const users = await db.Users.findAll()
 
+        console.log(users)
         return {
             EM: 'Lấy danh sách người dùng thành công!',
             EC: 0,
@@ -23,7 +24,7 @@ const handleCreateNewUser = async (rawData) => {
         await db.Users.create({
             username: rawData.username,
             email: rawData.email,
-            phone: rawData.phone,
+            phonenumber: rawData.phonenumber,
             address: rawData.address,
             sex: rawData.sex,
         })
@@ -73,8 +74,45 @@ const handleDeteleUser = async (userId) => {
     }
 }
 
+const handleUpdateUser = async (rawData) => {
+    try {
+        const user = await db.Users.findOne({
+            where: { id: rawData.id }
+        })
+
+        if (!user) {
+            return {
+                EM: 'Không tìm thấy người dùng!',
+                EC: -2,
+                DT: ''
+            }
+        }
+
+        user.update({
+            username: rawData.username,
+            email: rawData.email,
+            phone: rawData.phone,
+            address: rawData.address,
+            sex: rawData.sex
+        })
+
+        return {
+            EM: 'Cập nhật người dùng thành công',
+            EC: 0,
+            DT: ''
+        }
+    } catch (error) {
+        return {
+            EM: 'Lỗi!',
+            EC: -1,
+            DT: ''
+        }
+    }
+}
+
 module.exports = {
     handleGetAllUser,
     handleCreateNewUser,
-    handleDeteleUser
+    handleDeteleUser,
+    handleUpdateUser
 }

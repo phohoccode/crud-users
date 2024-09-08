@@ -12,6 +12,10 @@ const deleteUser = (id) => {
     return axios.delete(`http://localhost:8888/api/v1/delete/${id}`)
 }
 
+const updateUser = (data) => {
+    return axios.put(`http://localhost:8888/api/v1/update`, { data })
+}
+
 export {
-    getAllUser, createNewUser, deleteUser
+    getAllUser, createNewUser, deleteUser, updateUser
 }

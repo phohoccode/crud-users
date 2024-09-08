@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { deleteUser, getAllUser } from '../service/userService';
 
-function Users({ refresh }) {
+
+function Users({ refresh, setActionUser, setDataUser}) {
     const [users, setUsers] = useState([])
 
     const fetchAllUsers = async () => {
@@ -17,13 +18,17 @@ function Users({ refresh }) {
     }, [refresh])
 
     const handleDeleteUser = async (id) => {
-        
+
         const response = await deleteUser(id)
 
         if (response && response.data && +response.data.EC === 0) {
             fetchAllUsers()
         }
+    }
 
+    const handleUpdateUser = (user) => {
+        setActionUser('UPDATE')
+        setDataUser(user)
     }
 
     return (
@@ -47,14 +52,16 @@ function Users({ refresh }) {
                             <td>{user.id}</td>
                             <td>{user.username}</td>
                             <td>{user.email}</td>
-                            <td>{user.sex}</td>
+                            <td>{user.sex === '1' ? 'Nam' : 'Nữ'}</td>
                             <td>{user.phonenumber}</td>
                             <td>{user.address}</td>
                             <td>
                                 <button
                                     onClick={() => handleDeleteUser(user.id)}
                                     className='btn btn-danger mx-3'>Xoá</button>
-                                <button className='btn btn-warning'>Chỉnh sửa</button>
+                                <button
+                                    onClick={() => handleUpdateUser(user)}
+                                    className='btn btn-warning'>Chỉnh sửa</button>
                             </td>
                         </tr>
                     ))}

@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
 import _ from 'lodash'
-import { createNewUser } from '../service/userService'
+import { createNewUser, updateUser } from '../service/userService'
 
-function AddUser({onUserAdded}) {
-    const [user, setUser] = useState({
-        username: '',
-        email: '',
-        address: '',
-        phonenumber: '',
-        sex: ''
-    })
+function ActionUser({ onUserAdded, action, setActionUser, dataUser, defaultUser }) {
+    const [user, setUser] = useState(defaultUser)
+
+    useEffect(() => {
+        action === 'CREATE' ?
+            setUser(defaultUser) :
+            setUser(dataUser)
+    }, [action])
 
     const handleCheckInputs = () => {
-        if (!user.username || !user.email || !user.address || !user.phonenumber || !user.sex) {
+        if (!user.username || !user.email || !user.address || !user.phonenumber || user.sex === '--- Chọn giới tính ---') {
             return false
         }
         return true
@@ -24,18 +24,23 @@ function AddUser({onUserAdded}) {
         setUser(_user)
     }
 
-    const handleAddUser = async () => {
+    const handleActionsUser = async (type) => {
         const check = handleCheckInputs()
         if (!check) {
             alert('Vui lòng nhập nội dung!')
             return
         }
 
-        const response = await createNewUser(user)
+        const response = type === 'CREATE' ?
+            await createNewUser(user) :
+            await updateUser(user)
 
         if (response && response.data && +response.data.EC === 0) {
             onUserAdded()
+            setUser(defaultUser)
         }
+
+        type === 'UPDATE' && setActionUser('CREATE')
     }
 
     return (
@@ -70,16 +75,22 @@ function AddUser({onUserAdded}) {
 
             <div className='mb-3'>
                 <label className="form-label">Giới tính</label>
-                <select onChange={(e) => handleOnchangeInputs(e.target.value, 'sex')} className="form-select">
+                <select
+                    value={user.sex}
+                    onChange={(e) => handleOnchangeInputs(e.target.value, 'sex')} className="form-select">
                     <option selected>--- Chọn giới tính ---</option>
                     <option value="1">Nam</option>
                     <option value="2">Nữ</option>
                 </select>
             </div>
 
-            <button onClick={() => handleAddUser()} className='btn btn-primary'>Thêm</button>
+            {action === 'UPDATE' &&
+                <button onClick={() => setActionUser('CREATE')} className='btn btn-dark me-3'>Huỷ</button>}
+            <button onClick={() => handleActionsUser(action)} className='btn btn-primary'>
+                {action === 'CREATE' ? 'Thêm' : 'Lưu'}
+            </button>
         </>
     );
 }
 
-export default AddUser;
+export default ActionUser;
